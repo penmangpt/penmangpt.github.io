@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PenmanGPT一鍵生成10萬字的書籍</title>
+    <!-- Additional CSS or JavaScript files can be included here -->
+    <link rel="icon" type="image/x-icon" href="logo.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        input[type=text],
+        select {
+            width: 90%;
+            max-width: 500px;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            border-radius: 80px;
+        }
+
+        .button {
+            background-color: #5bc0de;
+            /* Green */
+            border: none;
+            color: #2c2c2c;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            padding-left: 50px;
+            padding-right: 50px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 80px;
+        }
+
+
+        .bottomright {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            font-size: 20px;
+            z-index: 99;
+            background: #3a3a3a;
+            padding: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 80px;
+            cursor: pointer;
+        }
+
+        .lds-spinner {
+            color: official;
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .lds-spinner div {
+            transform-origin: 40px 40px;
+            animation: lds-spinner 1.2s linear infinite;
+        }
+
+        .lds-spinner div:after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 3px;
+            left: 37px;
+            width: 6px;
+            height: 18px;
+            border-radius: 20%;
+            background: #fff;
+        }
+
+        .lds-spinner div:nth-child(1) {
+            transform: rotate(0deg);
+            animation-delay: -1.1s;
+        }
+
+        .lds-spinner div:nth-child(2) {
+            transform: rotate(30deg);
+            animation-delay: -1s;
+        }
+
+        .lds-spinner div:nth-child(3) {
+            transform: rotate(60deg);
+            animation-delay: -0.9s;
+        }
+
+        .lds-spinner div:nth-child(4) {
+            transform: rotate(90deg);
+            animation-delay: -0.8s;
+        }
+
+        .lds-spinner div:nth-child(5) {
+            transform: rotate(120deg);
+            animation-delay: -0.7s;
+        }
+
+        .lds-spinner div:nth-child(6) {
+            transform: rotate(150deg);
+            animation-delay: -0.6s;
+        }
+
+        .lds-spinner div:nth-child(7) {
+            transform: rotate(180deg);
+            animation-delay: -0.5s;
+        }
+
+        .lds-spinner div:nth-child(8) {
+            transform: rotate(210deg);
+            animation-delay: -0.4s;
+        }
+
+        .lds-spinner div:nth-child(9) {
+            transform: rotate(240deg);
+            animation-delay: -0.3s;
+        }
+
+        .lds-spinner div:nth-child(10) {
+            transform: rotate(270deg);
+            animation-delay: -0.2s;
+        }
+
+        .lds-spinner div:nth-child(11) {
+            transform: rotate(300deg);
+            animation-delay: -0.1s;
+        }
+
+        .lds-spinner div:nth-child(12) {
+            transform: rotate(330deg);
+            animation-delay: 0s;
+        }
+
+        @keyframes lds-spinner {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* width */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            border-radius: 10px;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: grey;
+            border-radius: 10px;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #171C20;
+        }
+
+        /******************************************************/
+        /* The Modal (background) */
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 1;
+            /* Sit on top */
+            padding-top: 100px;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Black w/ opacity */
+
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 10px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 20px;
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body style="background: #171C20;color: white;font-family: 'Noto Sans TC', sans-serif;">
+    <div class="bottomright" id="myBtn">🔗分享</div>
+
+    <br>
+    <div style="text-align: center;font-size: 30px;"><br>📘PenmanGPT✏️<br>一鍵生成10萬字書籍</div>
+    <div style="text-align: center;">
+        <h2 style="font-weight: 400;">《Python之道：從入門到精通網站開發》</h2>
+    </div>
+    <div style="text-align: center;margin-top: 5px;display: none">
+        <button class="button"> ▼ 免費下載電子書 ▼ </button>
+    </div>
+    <div style="text-align: center;margin-top: 5px;">
+        <h3 style="font-weight: 400;">正在生成書籍，進度:<br>38% (估計還剩: 20分鐘完成)</h3>
+        <div class="lds-spinner">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <br>
+    <div style="text-align: center; display: flex;
+    justify-content: center;">
+        <div style="text-align: left;font-size: 12px;width: 80%;
+    max-width: 255px;">
+            <pre style="white-space: pre-wrap;font-size:16px ;">
+第1章：Python基礎概念與語法介紹
+第2章：網站開發概述與工具配置
+第3章：HTML與CSS基礎
+第4章：Python與網頁交互
+第5章：網站前端框架與設計
+第6章：使用Python處理網頁表單
+第7章：資料庫概念與操作
+第8章：使用Python與資料庫交互
+第9章：會員系統與身份驗證
+第10章：圖片處理與檔案上傳
+第11章：資料加密與安全性
+第12章：網站部署與伺服器配置
+第13章：網站性能優化與快取技術
+第14章：SEO最佳實踐與網站分析
+第15章：API開發與串接
+第16章：網站測試與除錯技巧
+第17章：網站專案管理與團隊協作
+第18章：網站安全與漏洞防護
+第19章：網站監控與日誌分析
+第20章：未來發展趨勢與學習資源
+    </pre>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <input type="text" value="" id="url_box" readonly>
+            <button onclick="copy_url()" class="button">複製鏈結</button>
+            <script>
+                document.getElementById("url_box").value = window.location.href;
+                function copy_url() {
+                    // Get the text field
+                    var copyText = document.getElementById("url_box");
+
+                    // Select the text field
+                    copyText.select();
+                    copyText.setSelectionRange(0, 99999); // For mobile devices
+
+                    // Copy the text inside the text field
+                    navigator.clipboard.writeText(copyText.value);
+
+                }
+            </script>
+        </div>
+
+    </div>
+
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal 
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+
+</html>
