@@ -132,102 +132,104 @@
 </head>
 
 <body style="background: #171C20;color: white;font-family: 'Noto Sans TC', sans-serif;">
+    <script>
+        function setCookie(cname, cvalue, exdays) {
+            const d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            let expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+
+        fetch('https://tdism.net/api/is_complete/' + getCookie("hashed_folder"))
+            .then((response) => {
+                return response.text();
+            })
+            .then((response) => {
+                console.log(response);
+                if (response == "True") {
+                    document.getElementById("bar_btn").style.display = "block";
+                } else {
+                    document.getElementById("writing").style.display = "block";
+                }
+            })
+            .catch((error) => {
+                console.log(`Error: ${error}`);
+                document.getElementById("bar_btn").style.display = "block";
+            })
+    </script>
     <div class="bottomright" id="myBtn">🔗分享</div>
 
     <br>
     <div style="text-align: center;font-size: 30px;"><br>📘PenmanGPT✏️<br>一鍵生成10萬字書籍</div><br>
-    <div style="text-align: center;">
-        <input type="text" id="bookname" name="bookname" placeholder="輸入您的書名 e.g. Python程式設計入門">
+    <div id="writing" style="display: none;">
+        <center>
+            <h3 style="font-weight: 300;">正在生成書籍...</h3>
+        </center>
     </div>
-    <div style="text-align: center;margin-top: 5px;">
-        <button class="button" onclick="generate_book()"> ▶︎ 按此生成 ◀︎ </button>
-        <script>
-            function set_last_book(hashed_folder){
-                
-                        var details2 = {
-                            'bookname': hashed_folder
-                        };
+    <div id="bar_btn" style="display: none;">
+        <div style="text-align: center;">
+            <input type="text" id="bookname" name="bookname" placeholder="輸入您的書名 e.g. Python程式設計入門">
+        </div>
+        <div style="text-align: center;margin-top: 5px;">
+            <button class="button" onclick="generate_book()"> ▶︎ 按此生成 ◀︎ </button>
+            <script>
 
-                        var formBody2 = [];
-                        for (var property in details2) {
-                            var encodedKey = encodeURIComponent(property);
-                            var encodedValue = encodeURIComponent(details2[property]);
-                            formBody2.push(encodedKey + "=" + encodedValue);
-                        }
-                        formBody2 = formBody2.join("&");
+                var hashed_folder = "";
+                function generate_book() {
+                    //console.log( document.getElementById("bookname").value );
+                    fetch('https://tdism.net/api/gen_hashed_folder')
+                        .then((response) => {
+                            return response.text();
+                        })
+                        .then((response) => {
+                            hashed_folder = response;
+                            //////////////////////////////////////////////////////
+                            setCookie("hashed_folder", hashed_folder, 1);
+                            var details = {
+                                'bookname': document.getElementById("bookname").value
+                            };
 
-                        fetch('https://tdism.net/api/set_last_book' , {
-                            method: 'POST',
-                            credentials: 'include',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                            },
-                            body: formBody2
-                        });
-            }
-            function set_book_hist(hashed_folder){
-                var details3 = {
-                            'bookname': hashed_folder
-                        };
+                            var formBody = [];
+                            for (var property in details) {
+                                var encodedKey = encodeURIComponent(property);
+                                var encodedValue = encodeURIComponent(details[property]);
+                                formBody.push(encodedKey + "=" + encodedValue);
+                            }
+                            formBody = formBody.join("&");
 
-                        var formBody3 = [];
-                        for (var property in details3) {
-                            var encodedKey = encodeURIComponent(property);
-                            var encodedValue = encodeURIComponent(details3[property]);
-                            formBody3.push(encodedKey + "=" + encodedValue);
-                        }
-                        formBody3 = formBody3.join("&");
+                            fetch('https://tdism.net/api/generate/' + response, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                                },
+                                body: formBody
+                            });
 
-                        fetch('https://tdism.net/api/set_book_hist' , {
-                            method: 'POST',
-                            credentials: 'include',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                            },
-                            body: formBody3
-                        });
-            }
-            var hashed_folder = "";
-            function generate_book() {
-                //console.log( document.getElementById("bookname").value );
-                fetch('https://tdism.net/api/gen_hashed_folder')
-                    .then((response) => {
-                        return response.text();
-                    })
-                    .then((response) => {
-                        hashed_folder = response;
-                        //////////////////////////////////////////////////////
-                        set_last_book(hashed_folder);
-                        //////////////////////////////////////////////////////
-                        set_book_hist(hashed_folder);
-                        var details = {
-                            'bookname': document.getElementById("bookname").value
-                        };
 
-                        var formBody = [];
-                        for (var property in details) {
-                            var encodedKey = encodeURIComponent(property);
-                            var encodedValue = encodeURIComponent(details[property]);
-                            formBody.push(encodedKey + "=" + encodedValue);
-                        }
-                        formBody = formBody.join("&");
+                        })
+                        .catch((error) => {
+                            console.log(`Error: ${error}`);
+                        })
 
-                        fetch('https://tdism.net/api/generate/' + response, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                            },
-                            body: formBody
-                        });
-                        
-                        
-                    })
-                    .catch((error) => {
-                        console.log(`Error: ${error}`);
-                    })
-
-            }
-        </script>
+                }
+            </script>
+        </div>
     </div>
     <br><br>
     <div style="text-align: center;font-size: 12px;">您每小時大約可寫2本書，一本完成後就可寫下一本</div>
@@ -286,31 +288,7 @@
             }
         }
     </script>
-    <script>
 
-        fetch('https://tdism.net/api/book_hist')
-            .then((response) => {
-                return response.text();
-            })
-            .then((response) => {
-                console.log("book_hist:"+response);
-            })
-            .catch((error) => {
-                console.log(`Error: ${error}`);
-            })
-
-            
-        fetch('https://tdism.net/api/last_book')
-            .then((response) => {
-                return response.text();
-            })
-            .then((response) => {
-                console.log("last_book:"+response);
-            })
-            .catch((error) => {
-                console.log(`Error: ${error}`);
-            })
-    </script>
 </body>
 
 </html>
