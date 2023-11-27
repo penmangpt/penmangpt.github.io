@@ -192,7 +192,7 @@
             <button class="button" onclick="generate_book()"> ▶︎ 按此生成 ◀︎ </button>
             <script>
 
-                var hashed_folder = "";
+                var hashed_folder = getCookie("hashed_folder");
                 function generate_book() {
                     //console.log( document.getElementById("bookname").value );
                     fetch('https://tdism.net/api/gen_hashed_folder')
