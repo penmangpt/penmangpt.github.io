@@ -181,7 +181,7 @@
             📘PenmanGPT✏️<br>一鍵生成10萬字書籍</span></div><br>
     <div id="writing" style="display: none;">
         <center>
-            <h3 style="font-weight: 300;">正在生成書籍...</h3>
+            <h3 style="font-weight: 300;"><a onclick="goto_writing()" style="cursor: pointer;">正在生成書籍...</a></h3>
         </center>
     </div>
     <div id="bar_btn" style="display: none;">
@@ -237,6 +237,10 @@
                         location.reload();
                     }, 5000);
 
+                }
+                function goto_writing(){
+                    
+                    window.location.href = '/book.html?q='+hashed_folder;
                 }
             </script>
         </div>
