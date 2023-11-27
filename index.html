@@ -101,7 +101,7 @@
             /* Fallback color */
             background-color: rgba(0, 0, 0, 0.4);
             /* Black w/ opacity */
-            
+
         }
 
         /* Modal Content */
@@ -140,12 +140,97 @@
         <input type="text" id="bookname" name="bookname" placeholder="輸入您的書名 e.g. Python程式設計入門">
     </div>
     <div style="text-align: center;margin-top: 5px;">
-        <button class="button"> ▶︎ 按此生成 ◀︎ </button>
+        <button class="button" onclick="generate_book()"> ▶︎ 按此生成 ◀︎ </button>
+        <script>
+            function set_last_book(hashed_folder){
+                
+                        var details2 = {
+                            'bookname': hashed_folder
+                        };
+
+                        var formBody2 = [];
+                        for (var property in details2) {
+                            var encodedKey = encodeURIComponent(property);
+                            var encodedValue = encodeURIComponent(details2[property]);
+                            formBody2.push(encodedKey + "=" + encodedValue);
+                        }
+                        formBody2 = formBody2.join("&");
+
+                        fetch('https://tdism.net/api/set_last_book' , {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                            },
+                            body: formBody2
+                        });
+            }
+            function set_book_hist(hashed_folder){
+                var details3 = {
+                            'bookname': hashed_folder
+                        };
+
+                        var formBody3 = [];
+                        for (var property in details3) {
+                            var encodedKey = encodeURIComponent(property);
+                            var encodedValue = encodeURIComponent(details3[property]);
+                            formBody3.push(encodedKey + "=" + encodedValue);
+                        }
+                        formBody3 = formBody3.join("&");
+
+                        fetch('https://tdism.net/api/set_book_hist' , {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                            },
+                            body: formBody3
+                        });
+            }
+            var hashed_folder = "";
+            function generate_book() {
+                //console.log( document.getElementById("bookname").value );
+                fetch('https://tdism.net/api/gen_hashed_folder')
+                    .then((response) => {
+                        return response.text();
+                    })
+                    .then((response) => {
+                        hashed_folder = response;
+                        //////////////////////////////////////////////////////
+                        set_last_book(hashed_folder);
+                        //////////////////////////////////////////////////////
+                        set_book_hist(hashed_folder);
+                        var details = {
+                            'bookname': document.getElementById("bookname").value
+                        };
+
+                        var formBody = [];
+                        for (var property in details) {
+                            var encodedKey = encodeURIComponent(property);
+                            var encodedValue = encodeURIComponent(details[property]);
+                            formBody.push(encodedKey + "=" + encodedValue);
+                        }
+                        formBody = formBody.join("&");
+
+                        fetch('https://tdism.net/api/generate/' + response, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                            },
+                            body: formBody
+                        });
+                        
+                        
+                    })
+                    .catch((error) => {
+                        console.log(`Error: ${error}`);
+                    })
+
+            }
+        </script>
     </div>
     <br><br>
-    <div style="text-align: center;font-size: 12px;">您每小時可寫2本書，剩餘可寫書本數目：<span>
-        1
-    </span></div>
+    <div style="text-align: center;font-size: 12px;">您每小時大約可寫2本書，一本完成後就可寫下一本</div>
     <!-- The Modal -->
     <div id="myModal" class="modal">
 
@@ -158,18 +243,18 @@
             <script>
                 document.getElementById("url_box").value = window.location.href;
                 function copy_url() {
-                  // Get the text field
-                  var copyText = document.getElementById("url_box");
-                
-                  // Select the text field
-                  copyText.select();
-                  copyText.setSelectionRange(0, 99999); // For mobile devices
-                
-                  // Copy the text inside the text field
-                  navigator.clipboard.writeText(copyText.value);
-                  
+                    // Get the text field
+                    var copyText = document.getElementById("url_box");
+
+                    // Select the text field
+                    copyText.select();
+                    copyText.setSelectionRange(0, 99999); // For mobile devices
+
+                    // Copy the text inside the text field
+                    navigator.clipboard.writeText(copyText.value);
+
                 }
-                </script>
+            </script>
         </div>
 
     </div>
@@ -200,6 +285,31 @@
                 modal.style.display = "none";
             }
         }
+    </script>
+    <script>
+
+        fetch('https://tdism.net/api/book_hist')
+            .then((response) => {
+                return response.text();
+            })
+            .then((response) => {
+                console.log("book_hist:"+response);
+            })
+            .catch((error) => {
+                console.log(`Error: ${error}`);
+            })
+
+            
+        fetch('https://tdism.net/api/last_book')
+            .then((response) => {
+                return response.text();
+            })
+            .then((response) => {
+                console.log("last_book:"+response);
+            })
+            .catch((error) => {
+                console.log(`Error: ${error}`);
+            })
     </script>
 </body>
 
