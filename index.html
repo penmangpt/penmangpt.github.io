@@ -199,6 +199,7 @@
                         })
                         .then((response) => {
                             hashed_folder = response;
+                            window.open("/book.html?q=" + hashed_folder, '_blank');
                             //////////////////////////////////////////////////////
                             setCookie("hashed_folder", hashed_folder, 1);
                             var details = {
@@ -225,7 +226,14 @@
                         })
                         .catch((error) => {
                             console.log(`Error: ${error}`);
-                        })
+                        });
+
+                    document.getElementById("bar_btn").style.display = "none";
+                    document.getElementById("writing").style.display = "block";
+
+                    setTimeout(function () {
+                        location.reload();
+                    }, 5000);
 
                 }
             </script>
