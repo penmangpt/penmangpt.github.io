@@ -323,7 +323,7 @@
 
         </center>
     </div>
-    <div >
+    <div>
         <div style="text-align: center;">
             <input type="text" id="bookname" name="bookname" placeholder="輸入您的書名 e.g. Python程式設計入門" maxlength="100">
         </div>
@@ -333,53 +333,56 @@
             <script>
                 function search() {
                     //console.log( document.getElementById("bookname").value );
-                    if(document.getElementById("bookname").value != "")
-                    window.location.href  = "/search.html?q="+document.getElementById("bookname").value.replace(/\s|[0-9_]|[<>?,.`\[\]#$%^/:&*()~!@#$%^&*()_+]/g, '_');
+                    if (document.getElementById("bookname").value != "")
+                        window.location.href = "/search.html?q=" + document.getElementById("bookname").value.replace(/\s|[0-9_]|[<>?,.`\[\]#$%^/:&*()~!@#$%^&*()_+]/g, '_');
                 }
                 var hashed_folder = getCookie("hashed_folder");
                 function generate_book() {
                     //console.log( document.getElementById("bookname").value );
-                    fetch('https://tdism.net/api/gen_hashed_folder')
-                        .then((response) => {
-                            return response.text();
-                        })
-                        .then((response) => {
-                            hashed_folder = response;
-                            window.open("/book.html?q=" + hashed_folder, '_blank');
-                            //////////////////////////////////////////////////////
-                            setCookie("hashed_folder", hashed_folder, 1);
-                            var details = {
-                                'bookname': document.getElementById("bookname").value
-                            };
+                    if (document.getElementById("bookname").value != "") {
+                        fetch('https://tdism.net/api/gen_hashed_folder')
+                            .then((response) => {
+                                return response.text();
+                            })
+                            .then((response) => {
+                                hashed_folder = response;
+                                window.open("/book.html?q=" + hashed_folder, '_blank');
+                                //////////////////////////////////////////////////////
+                                setCookie("hashed_folder", hashed_folder, 1);
+                                var details = {
+                                    'bookname': document.getElementById("bookname").value
+                                };
 
-                            var formBody = [];
-                            for (var property in details) {
-                                var encodedKey = encodeURIComponent(property);
-                                var encodedValue = encodeURIComponent(details[property]);
-                                formBody.push(encodedKey + "=" + encodedValue);
-                            }
-                            formBody = formBody.join("&");
+                                var formBody = [];
+                                for (var property in details) {
+                                    var encodedKey = encodeURIComponent(property);
+                                    var encodedValue = encodeURIComponent(details[property]);
+                                    formBody.push(encodedKey + "=" + encodedValue);
+                                }
+                                formBody = formBody.join("&");
 
-                            fetch('https://tdism.net/api/generate/' + response, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                                },
-                                body: formBody
+                                fetch('https://tdism.net/api/generate/' + response, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                                    },
+                                    body: formBody
+                                });
+
+
+                            })
+                            .catch((error) => {
+                                console.log(`Error: ${error}`);
                             });
 
+                        document.getElementById("bar_btn").style.display = "none";
+                        document.getElementById("writing").style.display = "block";
 
-                        })
-                        .catch((error) => {
-                            console.log(`Error: ${error}`);
-                        });
+                        setTimeout(function () {
+                            location.reload();
+                        }, 5000);
+                    }
 
-                    document.getElementById("bar_btn").style.display = "none";
-                    document.getElementById("writing").style.display = "block";
-
-                    setTimeout(function () {
-                        location.reload();
-                    }, 5000);
 
                 }
                 function goto_writing() {
