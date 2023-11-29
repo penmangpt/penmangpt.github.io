@@ -56,6 +56,7 @@
             border-radius: 80px;
             cursor: pointer;
         }
+
         /*==================================*/
         .lds-spinner {
             color: official;
@@ -151,6 +152,7 @@
                 opacity: 0;
             }
         }
+
         /*=========================================*/
         /* width */
         ::-webkit-scrollbar {
@@ -229,76 +231,55 @@
 <body style="background: #171C20;color: white;font-family: 'Noto Sans TC', sans-serif;">
     <iframe id="download" style="display:none;"></iframe>
     <script>
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
+        book_list = [];
+        
+        function fetch_books() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
 
-        console.log(urlParams.get('q'));
-        const hashed_folder = urlParams.get('q');
+            console.log(urlParams.get('q'));
+            const hashed_folder = urlParams.get('q');
 
-        fetch('https://tdism.net/api/get_info/' + hashed_folder)
-            .then((response) => {
-                return response.json();
-            })
-            .then((response) => {
-                //console.log(response['bookname']);
-                document.getElementById('bookname').innerText = response['bookname'];
-                document.getElementById('finish_percent').innerText = response['progress'];
-                document.getElementById('toc').innerText = response['toc'];
-                if( response['progress'] == "100" ){
+            fetch("https://tdism.net/api/search_book/" + hashed_folder)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((response) => {
+
+                    book_list = response;
+                    console.log(book_list);
+                    document.getElementById('loading').style.display = "none";
                     
-                    document.getElementById("loading_spinner").style.display = "none";
-                    document.getElementById("download_btn").style.display = "block";
-                }
-
-            })
-            .catch((error) => {
-                console.log(`Error: ${error}`);
-
-            });
-        setInterval(function () {
-            
-            fetch('https://tdism.net/api/get_info/' + hashed_folder)
-            .then((response) => {
-                return response.json();
-            })
-            .then((response) => {
-                //console.log(response['bookname']);
-                document.getElementById('bookname').innerText = response['bookname'];
-                document.getElementById('finish_percent').innerText = response['progress'];
-                document.getElementById('toc').innerText = response['toc'];
-                if( response['progress'] == "100" ){
-                    
-                    document.getElementById("loading_spinner").style.display = "none";
-                    document.getElementById("download_btn").style.display = "block";
-                }
-            })
-            .catch((error) => {
-                console.log(`Error: ${error}`);
-
-            });
-        }, 3000);
-        function download(){
-            
-            document.getElementById('download').src = 'https://tdism.net/api/get_content/'+hashed_folder;
-            
+                    //document.getElementById('book_list').innerHTML += 
+                    for(book in book_list){
+                        //console.log(book_list[book]['bookname']);
+                        //console.log(book_list[book]['id']);
+                        document.getElementById('book_list').innerHTML += (
+                            '<a style="color: white; text-decoration: none; " target="_blank" href="'+(
+                                "/book.html?q="+book_list[book]['id']
+                            )+'">《'+book_list[book]['bookname']+'》</a><br><br>'
+                            );
+                    }
+                })
+                .catch((error) => {
+                    console.log(`Error: ${error}`);
+                    fetch_books();
+                });
         }
+        fetch_books();
     </script>
     <div class="bottomright" id="myBtn">🔗分享</div>
 
     <br>
     <div style="text-align: center;font-size: 30px;">
         <br><span style="cursor: pointer;" onclick="window.location.href = '/';">
-            📘PenmanGPT✏️<br>一鍵生成10萬字書籍</span></div><br>
+            📘PenmanGPT✏️<br>一鍵生成10萬字書籍</span>
+    </div><br>
     </div>
-    <div style="text-align: center;">
-        <h2 style="font-weight: 400;">《<span id="bookname"></span>》</h2>
-    </div>
-    <div style="text-align: center;margin-top: 5px;display: none" id="download_btn">
-        <button class="button" onclick="download()"> ▼ 免費下載電子書 ▼ </button>
-    </div>
+
+    <center><button class="button" onclick="window.location.href = '/';"> ▶︎ 回到主頁 ◀︎ </button></center><br>
     <div style="text-align: center;margin-top: 5px;" id="loading_spinner">
-        <h3 style="font-weight: 400;">正在生成書籍，進度:<br><span id="finish_percent"></span>%</h3>
-        <div class="lds-spinner" >
+        <div class="lds-spinner" id="loading">
             <div></div>
             <div></div>
             <div></div>
@@ -311,6 +292,9 @@
             <div></div>
             <div></div>
             <div></div>
+        </div>
+        <div id="book_list">
+
         </div>
     </div>
     <br>
@@ -321,11 +305,11 @@
             <pre style="white-space: pre-wrap;font-size:16px ;" id="toc">
 
     </pre>
-    
+
         </div>
-        
+
     </div>
-    
+
     <center><button class="button" onclick="window.location.href = '/';"> ▶︎ 回到主頁 ◀︎ </button></center>
     <br><br>
 
