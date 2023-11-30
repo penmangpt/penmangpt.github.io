@@ -232,13 +232,15 @@
     <iframe id="download" style="display:none;"></iframe>
     <script>
         book_list = [];
-        
+        keywords = "";
         function fetch_books() {
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
 
             console.log(urlParams.get('q'));
             const hashed_folder = urlParams.get('q');
+            keywords = hashed_folder.replace(/\s|[0-9_]|[<>?,.`\[\]#$%^/:&*()~!@#$%^&*()_+]/g, ' ');
+            console.log(keywords);
 
             fetch("https://tdism.net/api/search_book/" + hashed_folder)
                 .then((response) => {
@@ -249,16 +251,17 @@
                     book_list = response;
                     console.log(book_list);
                     document.getElementById('loading').style.display = "none";
-                    
+
                     //document.getElementById('book_list').innerHTML += 
-                    for(book in book_list){
+                    for (book in book_list) {
                         //console.log(book_list[book]['bookname']);
                         //console.log(book_list[book]['id']);
                         document.getElementById('book_list').innerHTML += (
-                            '<a style="color: white; text-decoration: none; " target="_blank" href="'+(
-                                "/book.html?q="+book_list[book]['id']
-                            )+'">《'+book_list[book]['bookname']+'》</a><br><br>'
-                            );
+                            '<a style="color: white; text-decoration: none; " target="_blank" href="' + (
+                                "/book.html?q=" + book_list[book]['id']
+                            ) + '">《' + book_list[book]['bookname'] + '》</a><br><br>'
+                        );
+                        document.getElementById('keywords').innerHTML = "🔎"+keywords+"🔎:<br><br>";
                     }
                 })
                 .catch((error) => {
@@ -278,6 +281,7 @@
     </div>
 
     <center><button class="button" onclick="window.location.href = '/';"> ▶︎ 回到主頁 ◀︎ </button></center><br>
+    <center id="keywords"></center>
     <div style="text-align: center;margin-top: 5px;" id="loading_spinner">
         <div class="lds-spinner" id="loading">
             <div></div>
