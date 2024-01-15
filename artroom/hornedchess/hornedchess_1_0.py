@@ -316,6 +316,7 @@ class color:
    END = '\033[0m'
 
 def struct2img(x):
+    x = [x, ""]
     board = x[0]
     temp_board = []
     j = 0
@@ -392,7 +393,20 @@ def farmerMoveBestMove():
     current_chess = findCowIndex(current_chessboard)[0]
     print(current_chessboard)
     
-
+def nextMoveMatrix():
+    global nextMoveDict
+    hcdict = nextMoveDict
+    out_list = []
+    for x in hcdict:
+        temp_row = []
+        temp_i = 0
+        for y in (hcdict[x]):
+            temp_row.append(y)
+            temp_i += 1
+        for y in range(temp_i,4):
+            temp_row.append(-1)
+        out_list.append(temp_row)
+    return out_list
 
 
 # In[2]:
